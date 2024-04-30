@@ -5,21 +5,21 @@ const fs = require('fs');
 
 const app = express();
 
-// Configurar Handlebars como el motor de plantillas
-app.engine(
-  'handlebars',
-  exphbs({
-    defaultLayout: 'main',
-    layoutsDir: path.join(__dirname, 'views/layouts'),
-    partialsDir: path.join(__dirname, 'views/partials')
-  })
-);
+const hbs = exphbs.create({
+  defaultLayout: 'main',
+  layoutsDir: path.join(__dirname, 'views/layouts'),
+  partialsDir: path.join(__dirname, 'views/partials')
+});
+
+app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
-// Configurar el middleware para servir archivos estáticos (JavaScript)
 app.use(express.static(path.join(__dirname, 'public'), {
-  // Agrega esta opción para especificar el tipo MIME de los archivos JavaScript
-  'Content-Type': 'application/javascript'
+  setHeaders: (res, path, stat) => {
+    if (path.endsWith('.js')) {
+      res.set('Content-Type', 'application/javascript');
+    }
+  }
 }));
 
 // Ruta raíz
@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
   try {
     // Obtener la ruta absoluta del archivo JSON de productos
     const productosPath = path.join(__dirname, 'data', 'productos.json');
-    
+
     // Verificar si el archivo existe
     if (!fs.existsSync(productosPath)) {
       throw new Error('El archivo productos.json no existe');
