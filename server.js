@@ -16,6 +16,7 @@ app.engine(
 );
 app.set('view engine', 'handlebars');
 
+// Configurar el middleware para servir archivos estáticos (JavaScript)
 app.use(express.static(path.join(__dirname, 'public'), {
   // Agrega esta opción para especificar el tipo MIME de los archivos JavaScript
   'Content-Type': 'application/javascript'
