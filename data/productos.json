@@ -1,0 +1,32 @@
+[
+  {
+    "nombre": "Banana",
+    "imagen": "banana.png",
+    "precio": 1.5
+  },
+  {
+    "nombre": "Cebollas",
+    "imagen": "cebollas.png",
+    "precio": 0.8
+  },
+  {
+    "nombre": "Lechuga",
+    "imagen": "lechuga.png",
+    "precio": 0.6
+  },
+  {
+    "nombre": "Papas",
+    "imagen": "papas.png",
+    "precio": 2.0
+  },
+  {
+    "nombre": "Pimentón",
+    "imagen": "pimenton.png",
+    "precio": 1.2
+  },
+  {
+    "nombre": "Tomate",
+    "imagen": "tomate.png",
+    "precio": 1.0
+  }
+]
