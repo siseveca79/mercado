@@ -1,89 +1,124 @@
-$(document).ready(function () {
-  // Inicializar la variable productosEnCarrito como un arreglo vacío
-  var productosEnCarrito = [];
+$(document).ready(() => {
+  // JSON de ejemplo con la información de los productos
+  const productos = [
+    {
+      "id": 0,
+      "nombre": "Banana",
+      "imagen": "banana.png",
+      "precio": 1.5
+    },
+    {
+      "id": 1,
+      "nombre": "Cebollas",
+      "imagen": "cebollas.png",
+      "precio": 0.8
+    },
+    {
+      "id": 2,
+      "nombre": "Lechuga",
+      "imagen": "lechuga.png",
+      "precio": 0.6
+    },
+    {
+      "id": 3,
+      "nombre": "Papas",
+      "imagen": "papas.png",
+      "precio": 2.0
+    },
+    {
+      "id": 4,
+      "nombre": "Pimentón",
+      "imagen": "pimenton.png",
+      "precio": 1.2
+    },
+    {
+      "id": 5,
+      "nombre": "Tomate",
+      "imagen": "tomate.png",
+      "precio": 1.0
+    }
+  ];
 
-  // Variable para almacenar los productos
-  var productos = [];
+  // Array para almacenar los productos en el carrito
+  const carrito = [];
 
-  // Cargar los productos al principio
-  $.getJSON('/data/productos.json', function (data) {
-    // Almacena los productos una vez que se han cargado
-    productos = data;
-  });
+  // Función para agregar un producto al carrito
+  function agregarAlCarrito(producto) {
+    const index = carrito.findIndex(p => p.id === producto.id);
+    if (index !== -1) {
+      carrito[index].cantidad++;
+    } else {
+      carrito.push({ ...producto, cantidad: 1 });
+    }
+    renderizarCarrito();
+  }
+
+  function renderizarCarrito() {
+    const listaCarrito = $('#listaCarrito');
+    listaCarrito.empty();
+
+    let total = 0;
+
+    carrito.forEach(producto => {
+        const subtotal = producto.precio * producto.cantidad;
+        total += subtotal;
+
+        const item = `
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <img src="/img/${producto.imagen}" alt="${producto.nombre}" class="carrito-imagen img-small">
+                        <span>${producto.nombre}</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary btn-quitar-item" data-id="${producto.id}">-</button>
+                        <span>${producto.cantidad}</span>
+                        <button class="btn btn-sm btn-outline-secondary btn-agregar-item" data-id="${producto.id}">+</button>
+                        <span class="subtotal">${subtotal.toFixed(2)} USD</span>
+                    </div>
+                </div>
+            </li>
+        `;
+        listaCarrito.append(item);
+    });
+
+    const totalCompra = $('#totalCompra');
+    totalCompra.text(`Total: $${total.toFixed(2)}`); // Agregar texto descriptivo al total
+    $('#carritoModal').modal('show');
+}
+
 
   // Evento para agregar un producto al carrito
-  $(document).on('click', '.btn-agregar', function () {
-    // Obtener el ID del producto del botón presionado
-    var productoId = $(this).data('id');
-
-    // Validar el ID del producto
-    if (!productoId || isNaN(productoId)) {
-      console.error('ID de producto inválido:', productoId);
-      return;
+  $('.btn-agregar').on('click', function () {
+    const id = parseInt($(this).data('id')); // Convertir a número entero
+    const producto = productos.find(p => p.id === id);
+    if (producto) {
+      agregarAlCarrito(producto);
     }
-
-    // Obtener los detalles del producto
-    var producto = obtenerProducto(productoId);
-
-    // Agregar el producto al arreglo productosEnCarrito
-    var productoEnCarrito = productosEnCarrito.find(function (p) {
-      return p.id === producto.id;
-    });
-
-    if (productoEnCarrito) {
-      productoEnCarrito.cantidad++;
-    } else {
-      producto.cantidad = 1;
-      productosEnCarrito.push(producto);
-    }
-
-    // Renderizar el carrito en el modal
-    renderizarCarrito();
   });
 
-  // Función para obtener los detalles de un producto por su ID
-  function obtenerProducto(id) {
-    // Buscar el producto con el ID proporcionado
-    return productos.find(function (p) {
-      return p.id === id;
-    });
-  }
+  // Eventos para quitar un producto del carrito
+  $(document).on('click', '.btn-quitar-item', function () {
+    const id = $(this).data('id');
+    const index = carrito.findIndex(p => p.id === id);
+    if (index !== -1 && carrito[index].cantidad > 1) {
+      carrito[index].cantidad--;
+      renderizarCarrito();
+    }
+  });
 
-  // Función para renderizar los productos del carrito en el modal
-  function renderizarCarrito() {
-    var carritoHTML = '';
-
-    // Iterar sobre cada producto en el carrito y construir el HTML correspondiente
-    productosEnCarrito.forEach(function (producto) {
-      carritoHTML += `
-        <li class="list-group-item">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <img src="/img/${producto.imagen}" alt="${producto.nombre}" class="carrito-imagen">
-              <span>${producto.nombre}</span>
-            </div>
-            <div>
-              <button class="btn btn-sm btn-outline-secondary btn-quitar-item" data-id="${producto.id}">-</button>
-              <span>${producto.cantidad}</span>
-              <button class="btn btn-sm btn-outline-secondary btn-agregar-item" data-id="${producto.id}">+</button>
-              <span class="subtotal">${(producto.precio * producto.cantidad).toFixed(2)} USD</span>
-            </div>
-          </div>
-        </li>
-      `;
-    });
-
-    // Actualizar el contenido del carrito en el modal
-    $('#listaCarrito').html(carritoHTML);
-  }
+  // Eventos para aumentar la cantidad de un producto en el carrito
+  $(document).on('click', '.btn-agregar-item', function () {
+    const id = $(this).data('id');
+    const index = carrito.findIndex(p => p.id === id);
+    if (index !== -1) {
+      carrito[index].cantidad++;
+      renderizarCarrito();
+    }
+  });
 
   // Evento para mostrar el modal de carrito cuando se haga clic en el botón "Ver Carrito"
-  $('#verCarritoNav').click(function () {
-    // Renderizar los productos del carrito en el modal
+  $('#verCarritoNav').on('click', function () {
     renderizarCarrito();
-
-    // Mostrar el modal
-    $('#carritoModal').modal('show');
   });
-
 });

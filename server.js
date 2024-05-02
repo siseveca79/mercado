@@ -14,6 +14,7 @@ const hbs = exphbs.create({
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
+// Configuración para servir archivos estáticos desde la carpeta "public"
 app.use(express.static(path.join(__dirname, 'public'), {
   setHeaders: (res, path, stat) => {
     if (path.endsWith('.js')) {
@@ -21,6 +22,9 @@ app.use(express.static(path.join(__dirname, 'public'), {
     }
   }
 }));
+
+// Ruta para servir el archivo productos.json estáticamente
+app.use('/data', express.static(path.join(__dirname, 'data')));
 
 // Ruta raíz
 app.get('/', (req, res) => {

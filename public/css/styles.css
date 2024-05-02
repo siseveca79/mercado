@@ -3,3 +3,8 @@
     padding-bottom: 20px; /* Puedes ajustar este valor según tu preferencia */
   }
   
+
+  .img-small {
+    width: 80px; /* Ajusta el tamaño según tus preferencias */
+    height: auto; /* Para mantener la proporción */
+}
